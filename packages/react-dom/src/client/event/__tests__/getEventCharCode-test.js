@@ -13,41 +13,86 @@
 var getEventCharCode = require('getEventCharCode');
 
 describe('getEventCharCode', () => {
+  var React;
+  var ReactDOM;
+  var ReactTestUtils;
+  var container;
+
+  beforeEach(() => {
+    jest.resetModules();
+    React = require('react');
+    ReactDOM = require('react-dom');
+    ReactTestUtils = require('react-dom/test-utils');
+    container = document.createElement('div');
+  });
+
   describe('when charCode is present in nativeEvent', () => {
     describe('when charCode is 0 and keyCode is 13', () => {
+
       it('returns 13', () => {
-        var nativeEvent = new KeyboardEvent('keypress', {
+        function checkCharCode(e) {
+          expect(e.charCode).toBe(13);
+        }
+
+        var component = ReactDOM.render(<input type="text" onKeyPressCapture={checkCharCode} />, container);
+
+        var node = ReactDOM.findDOMNode(component);
+
+        ReactTestUtils.Simulate.keyPress(node, {
           charCode: 0,
           keyCode: 13,
         });
-
-        expect(getEventCharCode(nativeEvent)).toBe(13);
       });
     });
 
     describe('when charCode is not 0 and/or keyCode is not 13', () => {
       describe('when charCode is 32 or bigger', () => {
         it('returns charCode', () => {
-          var nativeEvent = new KeyboardEvent('keypress', {charCode: 32});
+          function checkCharCode(e) {
+            expect(e.charCode).toBe(32);
+          }
 
-          expect(getEventCharCode(nativeEvent)).toBe(32);
+          var component = ReactDOM.render(<input type="text" onKeyPressCapture={checkCharCode} />, container);
+
+          var node = ReactDOM.findDOMNode(component);
+
+          ReactTestUtils.Simulate.keyPress(node, {
+            charCode: 32,
+          });
+
         });
       });
 
       describe('when charCode is smaller than 32', () => {
         describe('when charCode is 13', () => {
           it('returns 13', () => {
-            var nativeEvent = new KeyboardEvent('keypress', {charCode: 13});
+            function checkCharCode(e) {
+              expect(e.charCode).toBe(13);
+            }
 
-            expect(getEventCharCode(nativeEvent)).toBe(13);
+            var component = ReactDOM.render(<input type="text" onKeyPressCapture={checkCharCode} />, container);
+
+            var node = ReactDOM.findDOMNode(component);
+
+            ReactTestUtils.Simulate.keyPress(node, {
+              charCode: 13,
+            });
           });
         });
 
         describe('when charCode is not 13', () => {
           it('returns 0', () => {
-            var nativeEvent = new KeyboardEvent('keypress', {charCode: 31});
+            function checkCharCode(e) {
+              expect(e.charCode).toBe(0);
+            }
 
-            expect(getEventCharCode(nativeEvent)).toBe(0);
+            var component = ReactDOM.render(<input type="text" onKeyPressCapture={checkCharCode} />, container);
+
+            var node = ReactDOM.findDOMNode(component);
+
+            ReactTestUtils.Simulate.keyPress(node, {
+              charCode: 31,
+            });
           });
         });
       });
